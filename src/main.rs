@@ -93,6 +93,7 @@ fn move_the_particles(
                 *p.current_velocity.y_mut() *= -1.0;
             }
             let lerped_velocity = p.last_velocity.lerp(p.current_velocity, p.factor);
+            t.set_scale(lerped_velocity.length() / p.speed);
             t.translate(lerped_velocity * dt);
             p.factor += TRANS_TIME * dt;
             p.factor = p.factor.clamp(0.0, 1.0);
