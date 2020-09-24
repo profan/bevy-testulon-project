@@ -56,8 +56,7 @@ fn move_the_particles(
     game_time: Res<Time>,
     window: Res<Windows>,
     mut timer: ResMut<ParticleTimer>,
-    mut query: Query<(&mut Particle,
-    &mut Transform)>
+    mut query: Query<(&mut Particle, &mut Transform)>
 ) {
 
     let dt = game_time.delta_seconds;
@@ -67,7 +66,16 @@ fn move_the_particles(
     let w = (primary_window.width / 2) as f32;
     let h = (primary_window.height / 2) as f32;
 
-    // if timer.0.finished {
+   if timer.0.finished { // if our particle timer hits, recalculate velocities
+        for (mut p, mut t) in &mut query.iter() {
+            let v_x = ((rand::random::<f32>() - 0.5) * 2.0) * MOVE_SPEED;
+            let v_y = ((rand::random::<f32>() - 0.5) * 2.0) * MOVE_SPEED;
+            p.velocity.set_x(v_x);
+            p.velocity.set_y(v_y);
+        }
+   }
+   else
+   {
         for (mut p, mut t) in &mut query.iter() {
             if t.translation().x() < -w || t.translation().x() > w {
                 *p.velocity.x_mut() *= -1.0;
@@ -77,7 +85,7 @@ fn move_the_particles(
             }
             t.translate(p.velocity * dt);
         }
-    // }
+   }
 
 }
 
