@@ -48,7 +48,7 @@ fn create_the_particles(
             })
             .with(Particle {
                 id: i,
-                speed: 1.0,
+                speed: MOVE_SPEED,
                 current_velocity: Vec3::new(v_x, v_y, 0.0),
                 last_velocity:  Vec3::new(v_x, v_y, 0.0),
                 factor: 0.0
@@ -75,8 +75,8 @@ fn move_the_particles(
 
    if timer.0.finished { // if our particle timer hits, recalculate velocities
         for (mut p, mut t) in &mut query.iter() {
-            let v_x = ((rand::random::<f32>() - 0.5) * 2.0) * MOVE_SPEED;
-            let v_y = ((rand::random::<f32>() - 0.5) * 2.0) * MOVE_SPEED;
+            let v_x = ((rand::random::<f32>() - 0.5) * 2.0) * p.speed;
+            let v_y = ((rand::random::<f32>() - 0.5) * 2.0) * p.speed;
             p.last_velocity = p.current_velocity;
             p.current_velocity.set_x(v_x);
             p.current_velocity.set_y(v_y);
