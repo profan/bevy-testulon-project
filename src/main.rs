@@ -18,13 +18,20 @@ fn create_the_particles(
 ) {
 
     // textures
-    let texture_handle = asset_server.load("assets/branding/icon.png").unwrap();
-    let material_handle = materials.add(texture_handle.into());
+    let texture_asset = asset_server.load("assets/branding/icon.png").unwrap();
+    let texture_material = materials.add(texture_asset.into());
     let color_material = materials.add(Color::rgba(1.0, 0.0, 0.0, 1.0).into());
 
     // create the camera
     commands.spawn(Camera2dComponents::default());
 
+    // put a bevy logo up in there
+    commands.spawn(SpriteComponents {
+        material: texture_material,
+        ..Default::default()
+    });
+
+    // spawn some particles
     for i in 0..NUM_PARTICLES {
         let v_x = ((rand::random::<f32>() - 0.5) * 2.0) * MOVE_SPEED;
         let v_y = ((rand::random::<f32>() - 0.5) * 2.0) * MOVE_SPEED;
