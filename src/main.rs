@@ -1,3 +1,4 @@
+#![feature(clamp)]
 use bevy::prelude::*;
 use rand::prelude::*;
 
@@ -5,10 +6,13 @@ const MOVE_SPEED: f32 = 32.0;
 const NUM_PARTICLES: i32 = 100;
 const PARTICLE_SIZE: f32 = 64.0;
 const REPEAT_RATE: f32 = 2.0;
+const TRANS_TIME: f32 = 1.0;
 
 struct Particle {
     id: i32,
-    velocity: Vec3,
+    current_velocity: Vec3,
+    last_velocity: Vec3,
+    factor: f32,
     speed: f32
 }
 
@@ -44,8 +48,10 @@ fn create_the_particles(
             })
             .with(Particle {
                 id: i,
-                speed: 1.0f32,
-                velocity: Vec3::new(v_x, v_y, 0.0)
+                speed: 1.0,
+                current_velocity: Vec3::new(v_x, v_y, 0.0),
+                last_velocity:  Vec3::new(v_x, v_y, 0.0),
+                factor: 0.0
             });
     }
 
@@ -71,20 +77,25 @@ fn move_the_particles(
         for (mut p, mut t) in &mut query.iter() {
             let v_x = ((rand::random::<f32>() - 0.5) * 2.0) * MOVE_SPEED;
             let v_y = ((rand::random::<f32>() - 0.5) * 2.0) * MOVE_SPEED;
-            p.velocity.set_x(v_x);
-            p.velocity.set_y(v_y);
+            p.last_velocity = p.current_velocity;
+            p.current_velocity.set_x(v_x);
+            p.current_velocity.set_y(v_y);
+            p.factor = 0.0;
         }
    }
    else
    {
         for (mut p, mut t) in &mut query.iter() {
             if t.translation().x() < -w + (PARTICLE_SIZE / 2.0) || t.translation().x() > w - (PARTICLE_SIZE / 2.0) {
-                *p.velocity.x_mut() *= -1.0;
+                *p.current_velocity.x_mut() *= -1.0;
             }
             if t.translation().y() < -h + (PARTICLE_SIZE / 2.0) || t.translation().y() > h - (PARTICLE_SIZE / 2.0) {
-                *p.velocity.y_mut() *= -1.0;
+                *p.current_velocity.y_mut() *= -1.0;
             }
-            t.translate(p.velocity * dt);
+            let lerped_velocity = p.last_velocity.lerp(p.current_velocity, p.factor);
+            t.translate(lerped_velocity * dt);
+            p.factor += TRANS_TIME * dt;
+            p.factor = p.factor.clamp(0.0, 1.0);
         }
    }
 
