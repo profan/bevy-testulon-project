@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 use rand::prelude::*;
 
-const MOVE_SPEED: f32 = 32.0f32;
+const MOVE_SPEED: f32 = 32.0;
 const NUM_PARTICLES: i32 = 100;
-const REPEAT_RATE: f32 = 2.0f32;
+const PARTICLE_SIZE: f32 = 64.0;
+const REPEAT_RATE: f32 = 2.0;
 
 struct Particle {
     id: i32,
@@ -38,7 +39,7 @@ fn create_the_particles(
         commands
             .spawn(SpriteComponents {
                 material: color_material,
-                sprite: Sprite::new(Vec2::new(64.0, 64.0)),
+                sprite: Sprite::new(Vec2::new(PARTICLE_SIZE, PARTICLE_SIZE)),
                 ..Default::default()
             })
             .with(Particle {
@@ -77,10 +78,10 @@ fn move_the_particles(
    else
    {
         for (mut p, mut t) in &mut query.iter() {
-            if t.translation().x() < -w || t.translation().x() > w {
+            if t.translation().x() < -w + (PARTICLE_SIZE / 2.0) || t.translation().x() > w - (PARTICLE_SIZE / 2.0) {
                 *p.velocity.x_mut() *= -1.0;
             }
-            if t.translation().y() < -h || t.translation().y() > h {
+            if t.translation().y() < -h + (PARTICLE_SIZE / 2.0) || t.translation().y() > h - (PARTICLE_SIZE / 2.0) {
                 *p.velocity.y_mut() *= -1.0;
             }
             t.translate(p.velocity * dt);
